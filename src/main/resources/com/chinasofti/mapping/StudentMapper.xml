@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinasofti.mapping.StudentMapper">
+	<!-- <select id="getStudent" resultType="com.chinasofti.vo.Student"> select
+		s_id,s_pwd,s_name,s_gender,s_school,s_major,s_class,s_age,s_birth,s_politicalStatus,s_nativePlace,s_address,s_phone,s_email,s_photo,s_IDcard,s_loginFlag,s_creditFlag 
+		from student where s_id=#{s_id} and s_pwd=#{s_pwd} and s_name=#{s_name} and 
+		s_gender=#{s_gender} and s_school=#{s_school} and s_major=#{s_major} and 
+		s_class=#{s_class} and s_age=#{s_age} and s_birth=#{s_birth} and s_politicalStatus=#{s_politicalStatus} 
+		and s_nativePlace=#{s_nativePlace} and s_address=#{s_address} and s_phone=#{s_phone} 
+		and s_email=#{s_email} and s_photo=#{s_photo} and s_IDcard=#{s_IDcard} and 
+		s_loginFlag=#{s_loginFlag} and s_creditFlag=#{s_creditFlag} </select> -->
+	<!-- 查询用户是否存在 -->
+	<select id="getStudent" resultType="java.lang.Integer">
+		select count(*) from student where s_id=#{s_id} and s_pwd=#{s_pwd} and
+		s_loginflag <![CDATA[!= ]]>
+		0
+	</select>
+
+	<!--显示所有学生用户 -->
+	<select id="showAllStudent" resultType="com.chinasofti.vo.Student">
+		select * from student
+	</select>
+
+	<!--根据关键字keyword查询学生用户 -->
+	<select id="findStudentByKeyWord" resultType="com.chinasofti.vo.Student">
+		select * from student where 
+		s_id like binary concat('%',#{keyword},'%') or 
+		s_name like binary concat('%',#{keyword},'%') or
+		s_school like binary concat('%',#{keyword},'%') or
+		s_creditflag = #{keyword}
+	</select>
+	
+	<!--管理员删除用户 -->
+	<delete id="delete_admin">
+	delete from student where s_id = #{s_id}
+	</delete>
+
+	<!--根据id获取name -->
+	<select id="getName" resultType="java.lang.String">
+		select s_name from student where s_id=#{s_id}
+	</select>
+
+	<!--根据id获取学生资料 -->
+	<select id="showStudentById" resultType="com.chinasofti.vo.Student">
+		select * from student where s_id=#{s_id}
+	</select>
+
+	<!--显示本校的所有学生用户 -->
+	<select id="showAllStudent_schoolmanage" resultType="com.chinasofti.vo.Student">
+		select * from student,schoolmanage where
+		s_school = sm_school and sm_id =#{sm_id}
+	</select>
+
+	<!--显示在本银行申请过贷款的所有学生用户 -->
+	<select id="showAllStudent_bankmanage" resultType="com.chinasofti.vo.Student">
+		select * from student,creditrequest where
+		student.s_id = creditrequest.s_id and b_id =#{bm_bank} group by student.s_id
+	</select>
+	
+	<!--根据关键字keyword查询在本银行申请过贷款的所有学生用户-银行 -->
+	<select id="findStudentByKeyWord_bankmanage" resultType="com.chinasofti.vo.Student">
+		select * from student,creditrequest where 
+		creditrequest.b_id = #{bm_bank} and
+		student.s_id = creditrequest.s_id and(
+		creditrequest.s_id like binary concat('%',#{keyword},'%') or 
+		s_name like binary concat('%',#{keyword},'%') or
+		s_school like binary concat('%',#{keyword},'%'))
+		group by creditrequest.s_id
+	</select>
+
+</mapper>

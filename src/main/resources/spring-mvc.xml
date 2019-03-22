@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+    	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	<!-- 开启注解扫描 -->
+	<context:component-scan base-package="com.chinasofti.controller" />
+
+
+	<!-- 向springmvc上下文注册RequestMappingHandlerMapping RequestMappingHandlerAdapter 这两个类负责将url匹配到具体的controller方法-->
+		<mvc:annotation-driven conversion-service="conversionService">
+			<mvc:message-converters>
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+				<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+					<!-- MediaTypes -->
+					<property name="supportedMediaTypes">
+						<list>
+							<value>application/json;charset=utf-8</value>
+							<value>text/json;charset=utf-8</value>
+							<!--解决IE系列浏览器在服务器返回json时提示下载问题 -->
+							<value>text/html;charset=utf-8</value>
+						</list>
+					</property>
+				</bean>
+			</mvc:message-converters>
+		</mvc:annotation-driven>
+
+	<!-- 第二步： 创建convertion-Service ，并注入dateConvert-->
+	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<ref bean="dateConvert"/>
+			</set>
+		</property>
+	</bean>
+	<!-- 第一步:  创建自定义日期转换规则 -->
+	<bean id="dateConvert" class="com.chinasofti.utils.DateConvert"/>
+	
+	<!--设置根域名默认访问index-->
+    <mvc:view-controller path="/" view-name="forward:/welcome"/>
+    
+    <!-- 允许以/匹配url -->
+		<mvc:default-servlet-handler />
+    
+    <!-- 完成数据到页面的渲染工作 -->
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	        <property name="prefix" value="/WEB-INF/jsp/"/>
+	        <property name="suffix" value=".jsp"/>
+    	</bean>
+
+	<!-- 文件上传 -->
+	<bean id="multipartResolver"
+		  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设置上传文件的最大尺寸为5MB -->
+		<property name="maxUploadSize">
+			<value>5242880</value>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinasofti.mapping.NoticeMapper">
+
+	<!--显示所有公告 -->
+	<select id="showAllNotice" resultType="com.chinasofti.vo.Notice">
+		select * from notice
+	</select>
+	
+	<!--管理员删除公告 -->
+	<delete id="delete_admin">
+	delete from notice where n_id = #{n_id}
+	</delete>
+	
+	<!--显示所有银行公告 -->
+	<select id="showBankNotice" resultType="com.chinasofti.vo.Notice">
+		select * from notice where n_type = 'b' and flag <![CDATA[!= ]]> 0
+	</select>
+	
+	<!--根据s_id关联查找课程信息-->
+	<select id="getBank" resultType="com.chinasofti.vo.Bank">
+	select * from bank where b_id=#{n_author} and flag <![CDATA[!= ]]> 0
+	</select>
+	
+	<!--显示所有银行 -->
+	<select id="showBank" resultType="com.chinasofti.vo.Bank">
+		select * from bank where b_id = #{b_id}
+	</select>
+	
+	<!--显示所有学校公告-学生 -->
+	<select id="showSchoolNotice" resultType="com.chinasofti.vo.Notice">
+		select * from notice,student where n_author = s_school and s_id = #{s_id} and flag <![CDATA[!= ]]> 0
+	</select>
+	
+	<!--显示所有学校公告-学校 -->
+	<select id="showSchoolNotice2" resultType="com.chinasofti.vo.Notice">
+		select * from notice,schoolmanage where n_author = sm_school and sm_id = #{sm_id} and notice.flag <![CDATA[!= ]]> 0
+	</select>
+	
+	<!--根据关键字keyword查询公告 -->
+	<select id="findNoticeByKeyWord" resultType="com.chinasofti.vo.Notice">
+		select * from notice where (n_id = #{keyword} or n_title like binary concat('%',#{keyword},'%') or n_body like binary concat('%',#{keyword},'%') or n_author like binary concat('%',#{keyword},'%') or n_date like binary concat('%',#{keyword},'%') or n_type like binary concat('%',#{keyword},'%'))
+	</select>
+	
+	<!--学生端根据关键字keyword查询银行的公告 -->
+	<select id="findBankNoticeByKeyWord_student" resultType="com.chinasofti.vo.Notice">
+		select * from notice,bank where 
+		n_type = 'b' and n_author = b_id and
+		notice.flag <![CDATA[!= ]]> 0 and(
+		n_title like binary concat('%',#{keyword},'%') or
+		n_date like binary concat('%',#{keyword},'%') or
+		b_name like binary concat('%',#{keyword},'%'))
+	</select>
+	
+	<!--学生端根据关键字keyword查询本校的公告 -->
+	<select id="findSchoolNoticeByKeyWord_student" resultType="com.chinasofti.vo.Notice">
+		select * from notice where 
+		n_author = #{s_school} and
+		flag <![CDATA[!= ]]> 0 and(
+		n_title like binary concat('%',#{keyword},'%') or
+		n_date like binary concat('%',#{keyword},'%'))
+	</select>
+	
+	<!--学校删除学校公告-->
+	<update id="delete_schoolmanage">
+		update notice set flag = 0 where 
+		n_id = #{n_id}
+	</update>
+	
+	<!--显示公告详情 -->
+	<select id="findNoticeById" resultType="com.chinasofti.vo.Notice">
+		select * from notice where n_id = #{n_id}
+	</select>
+	
+	<!--显示所有本银行的公告-银行 -->
+	<select id="showBankNoticeById" resultType="com.chinasofti.vo.Notice">
+		select * from notice,bankmanage where 
+		n_author = bm_bank and bm_id = #{bm_id} and notice.flag <![CDATA[!= ]]> 0
+	</select>
+
+	<!--银行根据关键字keyword查询本行的公告 -->
+	<select id="findBankNoticeByKeyWord_bankmanage" resultType="com.chinasofti.vo.Notice">
+		select * from notice where 
+		n_author = #{bm_bank} and
+		flag <![CDATA[!= ]]> 0 and(
+		n_id like binary concat('%',#{keyword},'%') or
+		n_title like binary concat('%',#{keyword},'%') or
+		n_date like binary concat('%',#{keyword},'%'))
+	</select>
+
+	<!-- 添加公告 -->
+	<insert id="addNotice">
+		insert into notice(n_title,n_body,n_author,n_date,n_type) values
+		(#{notice.n_title},#{notice.n_body},#{notice.n_author},#{notice.n_date},#{notice.n_type})
+	</insert>
+	
+	<!-- getSchoolName  select name form school,notice where sch_id=n_id; -->
+
+</mapper>

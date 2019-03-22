@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinasofti.mapping.BankManageMapper">
+
+<!-- 查询用户是否存在 -->
+<select id="getBankManage" resultType="java.lang.Integer">
+select count(*) from bankmanage where bm_id=#{bm_id} and bm_pwd=#{bm_pwd} and flag <![CDATA[!= ]]> 0
+</select>
+
+<!--显示所有银行用户-->
+<select id="showAllBankManage" resultType="com.chinasofti.vo.BankManage">
+select * from bankmanage
+</select>
+
+<!--根据id获取name-->
+<select id="getName" resultType="java.lang.String">
+select bm_name from bankmanage where bm_id=#{bm_id}
+</select>
+
+<!--管理员删除用户 -->
+<delete id="delete_admin">
+delete from bankmanage where bm_id = #{bm_id}
+</delete>
+
+<!--根据id获取用户资料-->
+<select id="showBankManageById" resultType="com.chinasofti.vo.BankManage">
+select * from bankmanage where bm_id=#{bm_id}
+</select>
+
+<!--根据关键字keyword查询公告 -->
+<select id="findBankManageByKeyWord" resultType="com.chinasofti.vo.BankManage">
+	select * from bankmanage where 
+	bm_id like binary concat('%',#{keyword},'%') or 
+	bm_name like binary concat('%',#{keyword},'%') or
+	bm_bank like binary concat('%',#{keyword},'%')
+</select>
+
+</mapper>

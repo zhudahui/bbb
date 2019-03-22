@@ -1,0 +1,9 @@
+package ${daoPackage};
+
+#foreach(${pkg} in ${daoCtx.imports})
+import ${pkg};
+#end
+
+@Repository
+public interface ${daoName} extends CommonMapper<${entityName}> {
+}

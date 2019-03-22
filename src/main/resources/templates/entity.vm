@@ -1,0 +1,36 @@
+package ${entityPackage};
+
+#foreach(${pkg} in ${entityCtx.imports})
+import ${pkg};
+#end
+
+public class ${entityName} {
+#foreach(${column} in ${columnProperties})
+#if("$!column.remarks" != "")
+    /**
+     * ${column.remarks}
+     */
+#end
+#if(${column.primaryKey})
+    @Id
+    @GeneratedValue(generator = "JDBC")
+#end
+    private ${column.propertyJavaType} ${column.propertyName};
+
+#end
+#foreach(${column} in ${columnProperties})
+#if(${column.propertyJavaType.equals("Boolean")})
+#set($getprefix="is")
+#else
+#set($getprefix="get")
+#end
+
+    public ${column.propertyJavaType} ${getprefix}${column.propertyCapitalName}() {
+        return ${column.propertyName};
+    }
+
+    public void set${column.propertyCapitalName}(${column.propertyJavaType} ${column.propertyName}) {
+        this.${column.propertyName} = ${column.propertyName};
+    }
+#end
+}

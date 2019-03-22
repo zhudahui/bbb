@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinasofti.mapping.SchoolManageMapper">
+
+<!-- 查询用户是否存在 -->
+<select id="getSchoolManage" resultType="java.lang.Integer">
+select count(*) from schoolmanage where sm_id=#{sm_id} and sm_pwd=#{sm_pwd} and flag <![CDATA[!= ]]> 0
+</select>
+
+<!--显示所有学校用户-->
+<select id="showAllSchoolManage" resultType="com.chinasofti.vo.SchoolManage">
+select * from schoolmanage
+</select>
+
+<!--管理员删除用户 -->
+<delete id="delete_admin">
+delete from schoolmanage where sm_id = #{sm_id}
+</delete>
+
+<!-- 添加商品 -->
+<insert id="add_admin">
+insert into schoolmanage values (#{sm.sm_id},#{sm.sm_pwd},#{sm.sm_name},#{sm.sm_school},#{sm.sm_phone},#{sm.flag},#{sm.sm_qq})
+</insert>
+
+<!--根据id获取name-->
+<select id="getName" resultType="java.lang.String">
+select sm_name from schoolmanage where sm_id=#{sm_id}
+</select>
+
+<!--根据id获取用户资料-->
+<select id="showschoolManageById" resultType="com.chinasofti.vo.SchoolManage">
+select * from schoolmanage where sm_id=#{sm_id}
+</select>
+
+<!--根据关键字keyword查询公告 -->
+<select id="findSchoolManageByKeyWord" resultType="com.chinasofti.vo.SchoolManage">
+	select * from schoolmanage where 
+	sm_id like binary concat('%',#{keyword},'%') or 
+	sm_name like binary concat('%',#{keyword},'%') or
+	sm_school like binary concat('%',#{keyword},'%')
+</select>
+
+</mapper>

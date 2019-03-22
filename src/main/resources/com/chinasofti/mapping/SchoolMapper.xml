@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinasofti.mapping.SchoolMapper">
+
+<!-- 显示所有学校 -->
+<select id="showAllSchool" resultType="com.chinasofti.vo.School">
+select * from school
+</select>
+
+</mapper>

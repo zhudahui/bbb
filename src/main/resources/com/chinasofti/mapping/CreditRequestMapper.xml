@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chinasofti.mapping.CreditRequestMapper">
+
+	<!--显示所有贷款申请单 -->
+	<select id="showAllRequest" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest
+	</select>
+
+	<!--根据关键字keyword查询申请 -->
+	<select id="findRequestByKeyWord" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest where
+		r_id like binary concat('%',#{keyword},'%') or 
+		s_id like binary concat('%',#{keyword},'%') or 
+		b_id like binary concat('%',#{keyword},'%') or 
+		requestdate like binary concat('%',#{keyword},'%') or 
+		`use_type` like binary concat('%',#{keyword},'%')
+	</select>
+	
+	<!--管理员删除申请 -->
+	<delete id="delete_admin">
+	delete from creditrequest where r_id = #{r_id}
+	</delete>
+	
+	<!--根据关键字keyword查询申请-学生 -->
+	<select id="findRequestByKeyWord_student" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest where
+		s_id = #{s_id} and(
+		r_id like binary concat('%',#{keyword},'%') or 
+		money = #{keyword} or 
+		requestdate like binary concat('%',#{keyword},'%') or 
+		`use_type` like binary concat('%',#{keyword},'%'))
+		group by r_id
+	</select>
+
+	<!--学生查询个人所有申请 -->
+	<select id="findRequestByS_id" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest
+		where s_id = #{s_id}
+	</select>
+
+	<!--学生查询个人信息 -->
+	<select id="findStudentByS_id" resultType="com.chinasofti.vo.Student">
+		select * from
+		student
+		where s_id = #{s_id}
+	</select>
+
+	<!--学生查询申请详情(根据r_id查找creditrequest表) -->
+	<select id="findRequestByR_id" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest
+		where r_id = #{r_id}
+	</select>
+
+	<!--学生查询家庭信息 -->
+	<select id="findFamilyByS_id" resultType="com.chinasofti.vo.Family">
+		select * from
+		family
+		where s_id = #{s_id}
+	</select>
+	
+	<!--学生取消申请-->
+	<update id="delete_student">
+		update creditrequest set flag = 0 where 
+		r_id = #{r_id}
+	</update>
+
+	<!--显示所有未经学校审批的申请 -->
+	<select id="showAllNotCompleteRequest" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest,student
+		where student.s_id = creditrequest.s_id and
+		s_school = #{s_school} and flag in (1, 7)
+	</select>
+
+	<!--显示所有已经学校审批的申请 -->
+	<select id="showAllCompleteRequest" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest,student
+		where student.s_id =
+		creditrequest.s_id and s_school = #{s_school} and flag != 1
+	</select>
+	
+	<!--根据关键字keyword查询未审批的申请-学校 -->
+	<select id="findNotCompleteRequestByKeyWord_schoolmanage" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest,student where
+		creditrequest.s_id = student.s_id and
+		s_school = #{school} and
+		creditrequest.flag = 1 and (
+		r_id like binary concat('%',#{keyword},'%') or 
+		creditrequest.s_id like binary concat('%',#{keyword},'%') or 
+		money = #{keyword} or 
+		`use_type` like binary concat('%',#{keyword},'%'))
+		group by r_id
+	</select>
+	
+	<!--根据关键字keyword查询已审批的申请-学校 -->
+	<select id="findCompleteRequestByKeyWord_schoolmanage" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest,student where
+		creditrequest.s_id = student.s_id and
+		s_school = #{school} and
+		flag <![CDATA[!= ]]> 1 and 
+		flag <![CDATA[!= ]]> 0 and(
+		r_id like binary concat('%',#{keyword},'%') or 
+		creditrequest.s_id like binary concat('%',#{keyword},'%') or 
+		money = #{keyword} or 
+		`use_type` like binary concat('%',#{keyword},'%'))
+		group by r_id
+	</select>
+	
+	<!--通过申请-学校 -->
+	<update id="pass_schoolmanage">
+		update creditrequest set schoolidea = #{schoolidea} , flag = 2 where 
+		r_id = #{r_id}
+	</update>
+	
+	<!--否决申请-学校 -->
+	<update id="fail_schoolmanage">
+		update creditrequest set schoolidea = #{schoolidea} , flag = 3 where 
+		r_id = #{r_id}
+	</update>
+
+	<!--显示所有未经银行审批的申请 -->
+	<select id="showAllNotCompleteRequest_bankmanage" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest
+		where b_id = #{bm_bank} and flag in (2,9,6)
+	</select>
+
+	<!--显示所有已经银行审批的申请 -->
+	<select id="showAllCompleteRequest_bankmanage" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest
+		where b_id = #{bm_bank} and flag in (4,5,8,9)
+	</select>
+	
+	<!--根据关键字keyword查询未审批的申请-银行 -->
+	<select id="findNotCompleteRequestByKeyWord_bankmanage" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest where
+		b_id = #{bm_bank} and
+		flag = 2 and (
+		r_id like binary concat('%',#{keyword},'%') or 
+		s_id like binary concat('%',#{keyword},'%') or 
+		money = #{keyword} or 
+		`use_type` like binary concat('%',#{keyword},'%'))
+		group by r_id
+	</select>
+	
+	<!--根据关键字keyword查询已审批的申请-银行 -->
+	<select id="findCompleteRequestByKeyWord_bankmanage" resultType="com.chinasofti.vo.CreditRequest">
+		select * from
+		creditrequest where
+		b_id = #{bm_bank} and(
+		flag = 4 or flag = 5) and (
+		r_id like binary concat('%',#{keyword},'%') or 
+		s_id like binary concat('%',#{keyword},'%') or 
+		money = #{keyword} or 
+		`use_type` like binary concat('%',#{keyword},'%'))
+		group by r_id
+	</select>
+	
+	<!--通过申请-银行 -->
+	<update id="pass_bankmanage">
+		update creditrequest set bankidea = #{bankidea} , flag = 4 where 
+		r_id = #{r_id}
+	</update>
+	
+	<!--否决申请-银行 -->
+	<update id="fail_bankmanage">
+		update creditrequest set bankidea = #{bankidea} , flag = 5 where 
+		r_id = #{r_id}
+	</update>
+
+</mapper>
